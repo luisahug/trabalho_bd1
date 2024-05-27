@@ -23,7 +23,7 @@ CREATE TABLE jogador(
 	saldo DECIMAL(50, 2) -- O jogo é baseado em ter muito dinheiro, precisamos de muito espaço nesse campo;
 );
 
-CREATE TABLE tipo_investimento(
+CREATE TABLE tipo_investimento (
 	id_tipo_investimento SERIAL PRIMARY KEY,
 	nome VARCHAR(30),
 
@@ -37,34 +37,18 @@ CREATE TABLE tipo_investimento(
 
 CREATE TABLE gestor(
 	id_gestor SERIAL PRIMARY KEY,
-	id_tipo_inv INT FOREIGN KEY,
+	id_tipo_inv INT,
 
 	nome VARCHAR(30),
 	custo_aquisicao DECIMAL(10, 2), -- Grande mas não tão grande;
 
-	comissao_venda REAL -- seria porcentagem em decimal?
+	comissao_venda REAL,-- seria porcentagem em decimal?
 		-- Pro nosso caso sim; representa melhor a ideia que queremos.
 
-	FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimentos (id_tipo_inv)
+	CONSTRAINT fk_tipo_investimento 
+		FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_investimento)
  );
  
-CREATE TABLE tipo_melhoria(
- 	id_tipo_melhoria SERIAL PRIMARY KEY,
-	id_tipo_inv INT FOREIGN KEY,
-	nome VARCHAR(30),
-	desc VARCHAR(200),
-
-	id_atributo_melhorado FOREIGN KEY,
-	taxa_alteracao REAL, -- Essa nunca vai ser um numero grande, nem com muitas casas decimais;
-	-- Ex.: 
-	--	[
-	--		taxa_alteracao: -10.0;
-	--		id_atri...    : 2 (PRICE_GROWTH_RATE); 
-	--	] ; A taxa de crescimento de preço reduzirá em 10%; 90% -> 81%;
-	
-	FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimentos (id_tipo_inv),
-	FOREIGN KEY (id_atributo_melhorado) REFERENCES atributos_melhoraveis (id_atributo)
-);
 
 -- Essa tabela vai fugir à regra dos três campos com tipos diferentes...
 -- Teríamos que pensar em alguma coisa a mais pra pôr aqui (criado_em...)
@@ -74,10 +58,31 @@ CREATE TABLE atributos_melhoraveis (
 	nome VARCHAR(20) -- GROWTH_RATE, PRICE_GROWTH_RATE, CYCLE_TIME ... 
 );
 
+CREATE TABLE tipo_melhoria(
+ 	id_tipo_melhoria SERIAL PRIMARY KEY,
+	id_tipo_inv INT,
+	nome VARCHAR(30),
+	descr VARCHAR(200), -- "desc" é palavra reservada 
+
+	id_atributo_melhorado INT,
+	taxa_alteracao REAL, -- Essa nunca vai ser um numero grande, nem com muitas casas decimais;
+	-- Ex.: 
+	--	[
+	--		taxa_alteracao: -10.0;
+	--		id_atri...    : 2 (PRICE_GROWTH_RATE); 
+	--	] ; A taxa de crescimento de preço reduzirá em 10%; 90% -> 81%;
+
+	CONSTRAINT fk_tipo_investimento 
+		FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_investimento),
+	CONSTRAINT fk_tipo_atributo
+		FOREIGN KEY (id_atributo_melhorado) REFERENCES atributos_melhoraveis (id_atributo)
+);
+
+
 CREATE TABLE investimentos(
 	id_inv SERIAL PRIMARY KEY,
-	id_jogador FOREIGN KEY,
-	id_tipo_inv FOREIGN KEY,
+	id_jogador INT,
+	id_tipo_inv INT,
 
 	nivel_atual INT,
 
@@ -85,13 +90,15 @@ CREATE TABLE investimentos(
 	ultima_coleta_em TIMESTAMP,
 	ultimo_ciclo_iniciou_em TIMESTAMP,
 
-	FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador),
-	FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_inv)
+	CONSTRAINT fk_id_jogador
+		FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador),
+	CONSTRAINT fk_id_investimento
+		FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_investimento)
 );
 
 CREATE TABLE rendimentos(
 	id_rendimento SERIAL PRIMARY KEY,
-	id_inv INT FOREIGN KEY,
+	id_inv INT,
 
 	valor_obtido DECIMAL(20, 2), -- Pode ser gigante em algum ponto do jogo
 
@@ -99,27 +106,33 @@ CREATE TABLE rendimentos(
 
 	ciclo_concluido_em TIMESTAMP,
 	coletado_em TIMESTAMP,
+
+	CONSTRAINT fk_id_investimento 
 	FOREIGN KEY (id_inv) REFERENCES investimentos (id_inv)
 );
 
 CREATE TABLE contratacao_gestor(
 	id_contratacao SERIAL PRIMARY KEY,
-	id_jogador INT FOREIGN KEY,
-	id_gestor INT FOREIGN KEY,
+	id_jogador INT,
+	id_gestor INT,
 	contratado_em TIMESTAMP,
 
-	FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador),
-	FOREIGN KEY (id_gestor) REFERENCES gestor (id_gestor)
+	CONSTRAINT fk_id_jogador
+		FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador),
+	CONSTRAINT fk_id_gestor
+		FOREIGN KEY (id_gestor) REFERENCES gestor (id_gestor)
 );
 
 CREATE TABLE melhorias(
-	id_melhoria SERIAL PRIMARY_KEY,
-	id_tipo_melhoria INT FOREIGN KEY,
-	id_jogador INT FOREIGN KEY,
+	id_melhoria SERIAL PRIMARY KEY,
+	id_tipo_melhoria INT,
+	id_jogador INT,
 	adquirido_em TIMESTAMP,
-	
-	FOREIGN KEY (id_tipo_melhoria) REFERENCES tipo_melhoria (id_tipo_melhoria),
-	FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador)
+
+	CONSTRAINT fk_id_tipo_melhoria
+		FOREIGN KEY (id_tipo_melhoria) REFERENCES tipo_melhoria (id_tipo_melhoria),
+	CONSTRAINT fk_id_jogador
+		FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador)
 );
 
 
@@ -132,8 +145,8 @@ CREATE TABLE tipo_item(
 
 CREATE TABLE itens(
 	cod_item SERIAL PRIMARY KEY,
-	id_tipo_item INT FOREIGN KEY,
-	id_jogador INT FOREIGN KEY,
+	id_tipo_item INT,
+	id_jogador INT,
 	posicao_inventario INT,
 
 	esta_em_destaque VARCHAR(1) CHECK (esta_em_destaque IN ('s', 'n')),
@@ -142,6 +155,8 @@ CREATE TABLE itens(
 
 	obtido_em TIMESTAMP,
 
-	FOREIGN KEY (id_tipo_item) REFERENCES tipo_item (id_tipo_item),
-	FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador)
+	CONSTRAINT fk_tipo_item 
+		FOREIGN KEY (id_tipo_item) REFERENCES tipo_item (id_tipo_item),
+	CONSTRAINT fk_id_jogador
+		FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador)
 );
