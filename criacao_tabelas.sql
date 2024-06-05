@@ -1,9 +1,6 @@
 CREATE SCHEMA trabalho;
 SET search_path = trabalho;
 
--- ALTERACOES
---adicionei os ON DELETE CASCADE em todos os fk, nao sei se seria em todos mesmo e se coloquei certo kk
-
 CREATE TABLE jogador(
 	id_jogador SERIAL PRIMARY KEY,
 	nome VARCHAR(30),
