@@ -17,8 +17,9 @@ CREATE TABLE tipo_investimento (
 	nome VARCHAR(30),
 
 	valor_aquisicao REAL,
-	
-    rendimento_ciclo REAL, 
+
+	rendimento_ciclo REAL, 
+
 	tempo_ciclo_sec SMALLINT, 
 
 	gr_rendimento REAL,       
@@ -35,8 +36,7 @@ CREATE TABLE gestor(
 	comissao_venda REAL,
 
 	CONSTRAINT fk_tipo_investimento 
-		FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_investimento)
-        ON DELETE CASCADE
+	  FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_investimento) ON DELETE CASCADE
  );
  
 
@@ -55,11 +55,9 @@ CREATE TABLE tipo_melhoria(
 	taxa_alteracao REAL, 
 
 	CONSTRAINT fk_tipo_investimento 
-		FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_investimento)
-        ON DELETE CASCADE,
+		FOREIGN KEY (id_tipo_inv) REFERENCES tipo_investimento (id_tipo_investimento) ON DELETE CASCADE,
 	CONSTRAINT fk_tipo_atributo
-		FOREIGN KEY (id_atributo_melhorado) REFERENCES atributos_melhoraveis (id_atributo)
-        ON DELETE CASCADE
+		FOREIGN KEY (id_atributo_melhorado) REFERENCES atributos_melhoraveis (id_atributo) ON DELETE CASCADE
 );
 
 
@@ -96,7 +94,7 @@ CREATE TABLE rendimentos(
 	coletado_em TIMESTAMP,
 
 	CONSTRAINT fk_id_investimento 
-        FOREIGN KEY (id_inv) REFERENCES investimentos (id_inv) ON DELETE CASCADE
+	  FOREIGN KEY (id_inv) REFERENCES investimentos (id_inv) ON DELETE CASCADE
 );
 
 CREATE TABLE contratacao_gestor(
