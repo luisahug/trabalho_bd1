@@ -65,7 +65,7 @@
 -- | // Exibe as contratações com os nomes do jogador e gestor envolvidos.
 -- | 
 
-    SELECT cg.id_contratacao, j.nome AS 'jogador', g.nome AS 'gestor', cg.contratado_em
+    SELECT cg.id_contratacao, j.nome AS "jogador", g.nome AS "gestor", cg.contratado_em
     FROM contratacao_gestor cg
     INNER JOIN jogador j ON cg.id_jogador = j.id_jogador
     INNER JOIN gestor g ON cg.id_gestor = g.id_gestor;
@@ -79,10 +79,16 @@
 -- | três tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | // Exibe todos os rendimentos dos investimentos em Mercado de cada jogador
 -- | 
 
--- Código SQL aqui
+    SELECT j.nome AS nome_jogador, ti.nome AS nome_investimento, i.*, r.valor_obtido AS  
+        "valor rendimento", r.ciclo_concluido_em, r.coletado_em
+    FROM rendimentos r 
+    INNER JOIN investimentos i ON r.id_inv = i.id_inv
+    INNER JOIN tipo_investimento ti ON i.id_tipo_inv = ti.id_tipo_inv
+    INNER JOIN jogador j ON i.id_jogador = j.id_jogador
+    WHERE ti.nome = "Mercado";
 
 -- | 
 -- +------------------------------------
@@ -97,7 +103,7 @@
 --      renderam mais que rendimento por ciclo
 -- | 
 
-    SELECT inv.*, ti.nome AS 'tipo investimento', ti.rendimento_ciclo
+    SELECT inv.*, ti.nome AS "tipo investimento", ti.rendimento_ciclo
     FROM investimentos inv
     INNER JOIN tipo_investimento ti ON inv.id_tipo_investimento = ti.id_tipo_investimento
     WHERE inv.ultima_coleta_em IS NOT NULL AND inv.rendimento_atual > ti.rendimento_ciclo;
@@ -118,7 +124,7 @@
     SELECT inv.* 
     WHERE investimentos inv 
     INNER JOIN jogador j ON inv.id_jogador = j.id_jogador
-    WHERE inv.id_jogador = 3 AND inv.obtido_em LIKE '2024-01-%';
+    WHERE inv.id_jogador = 3 AND TO_CHAR(inv.obtido_em) LIKE "2024-01-%";
 
 -- | 
 -- +------------------------------------
@@ -127,13 +133,16 @@
 -- [J]----------------------------------
 -- | Implementar uma consulta usando a cláusula like 
 -- | e o argumento _, envolvendo no mínimo 
--- | 2tabelas 
+-- | 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | // Exibe os investimentos onde o preço atual é entre 200 a 299 reais.
 -- | 
 
--- Código SQL aqui
+    SELECT i.*, ti.nome nome_investimento
+    FROM investimentos i 
+    INNER JOIN tipo_investimento ti ON i.id_tipo_inv = ti.id_tipo_inv
+    WHERE TO_CHAR(i.preco_atual) LIKE "2__" 
 
 -- | 
 -- +------------------------------------
@@ -141,7 +150,7 @@
 
 -- [K]----------------------------------
 -- | Implementar uma consulta com subconsulta, usando a 
--- | cláusula IN, envolvendo no mínimo 2tabelas 
+-- | cláusula IN, envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
 -- | // Insira comentário aqui.
@@ -170,7 +179,7 @@
 
 -- [M]----------------------------------
 -- | Implementar uma consulta com subconsulta, usando a 
--- | cláusula EXISTS, envolvendo no mínimo 2tabelas 
+-- | cláusula EXISTS, envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
 -- | // Insira comentário aqui.
