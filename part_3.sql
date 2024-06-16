@@ -196,10 +196,14 @@
 -- | envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | // Exibe uma relação de todos os jogadores e gestores do jogo
 -- | 
 
--- Código SQL aqui
+    SELECT id_jogador, nome, "Jogador" AS tipo
+    FROM jogador
+    UNION
+    SELECT id_gestor, nome, "Gestor" AS tipo
+    FROM gestor
 
 -- | 
 -- +------------------------------------
@@ -211,10 +215,13 @@
 -- | no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | // Exibe a lista de jogadores e seu total investido
 -- | 
 
--- Código SQL aqui
+    SELECT j.nome, SUM(i.preco_atual) AS total_investimento
+    FROM investimentos i 
+    INNER JOIN jogador j ON i.id_jogador = j.id_jogador
+    GROUP BY j.nome;
 
 -- | 
 -- +------------------------------------
@@ -270,10 +277,10 @@
 -- | Implementar uma consulta usando a cláusula DROP 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Primeiro remove a coluna que usa a PK da tabela do drop como FK, e depois
+--   exclui a tabela atributos_melhoraveis
 -- | 
 
-    --primeiro remover coluna que usa a PK da tabela do drop como FK
     ALTER TABLE tipo_melhoria
     DELETE COLUMN id_atributo_melhorado; 
 
@@ -289,9 +296,7 @@
 -- +------------------------------------
 -- | 
 -- | // Insira comentário aqui.
--- | 
 
--- Código SQL aqui
 
 -- | 
 -- +------------------------------------
