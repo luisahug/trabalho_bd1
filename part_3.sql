@@ -49,7 +49,7 @@
 -- | usando equi-join 
 -- +------------------------------------
 -- | 
--- | Retorna todas os investimentos com infomarções
+-- | Retorna todas os investimentos com informações
 -- | sobre o tipo e o jogador dono.
 -- | 
 
@@ -373,7 +373,7 @@
 -- | 
 
     -- |
-    -- | Primeiro remover coluna que é dependente ta tabela a ser removida.
+    -- | Primeiro remover coluna que é dependente da tabela a ser removida.
     -- |
 
     ALTER TABLE tipo_melhoria
