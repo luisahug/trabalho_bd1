@@ -13,8 +13,8 @@ VALUES
     ( 'Juninho Gamer' , 'jg@gmail.com'),
     ( 'Bruninho Gamer', 'bg@gmail.com'),
     ( 'Moacir Gomes'  , 'mg@gmail.com'),
-    ( 'Lan - PC #1'   , 'l1@gmail.com'),
-    ( 'Lan - PC #2'   , 'l2@gmail.com');
+    ( 'Jogador 1'     , 'p1@gmail.com'),
+    ( 'Jogador 2'     , 'p2@gmail.com');
 
 -- |
 -- +------------------------------------
@@ -106,6 +106,10 @@ VALUES
 
     (4, 1),
     (4, 2);
+
+-- Atualiza a ultima coleta dos necessaŕios para demonstração.
+UPDATE investimentos SET ultima_coleta_em = CURRENT_TIMESTAMP
+WHERE id_inv IN (1,2,6,7);
     
 -- |
 -- +------------------------------------
@@ -117,7 +121,7 @@ VALUES
 
 INSERT INTO rendimentos (id_inv, valor_obtido, nivel_inv, ciclo_concluido_em, coletado_em )
 VALUES 
-    ( 1,    10, 1, CURRENT_TIMESTAMP,      CURRENT_TIMESTAMP ),
+    ( 1,    10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP ),
     ( 1,    10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP ),
     ( 1,    10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP ),
     ( 2,   100, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP ),
@@ -125,7 +129,7 @@ VALUES
     ( 4, 10000, 1, CURRENT_TIMESTAMP, NULL ),
     ( 5, 50000, 1, CURRENT_TIMESTAMP, NULL ),
 
-    ( 6,  10, 1, CURRENT_TIMESTAMP,      CURRENT_TIMESTAMP ),
+    ( 6,  10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP ),
     ( 7, 100, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
     
 

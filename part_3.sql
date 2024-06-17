@@ -2,24 +2,26 @@
 -- | Gerar uma consulta que envolva uma tabela 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Seleciona todos os jogadores existentes.
 -- | 
 
-    SELECT * FROM jogador
+    SELECT * FROM jogador;
 
 -- | 
 -- +------------------------------------
-
 
 -- [C]----------------------------------
 -- | Gerar uma consulta que envolva duas tabelas 
 -- | usando equi-join 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Relaciona tipos de investimento com seus
+-- | respectivos gestores
 -- | 
 
--- Código SQL aqui
+    SELECT ti.nome, g.nome as gestor
+    FROM tipo_investimento ti, gestor g
+    WHERE ti.id_tipo_investimento = g.id_tipo_inv;
 
 -- | 
 -- +------------------------------------
@@ -30,10 +32,13 @@
 -- | usando inner-join 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Exibe os itens dos usuários e as informações de cada tipo de item
 -- | 
 
--- Código SQL aqui
+    SELECT itens.*, tipo_item.*
+    FROM itens
+    INNER JOIN tipo_item
+    USING(id_tipo_item);
 
 -- | 
 -- +------------------------------------
@@ -44,10 +49,19 @@
 -- | usando equi-join 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Retorna todas os investimentos com infomarções
+-- | sobre o tipo e o jogador dono.
 -- | 
 
--- Código SQL aqui
+    SELECT ti.nome, i.obtido_em, j.nome as jogador
+    FROM tipo_investimento ti, jogador j, investimentos i
+    WHERE 
+        (
+            ti.id_tipo_investimento = i.id_tipo_inv AND 
+            i.id_jogador = j.id_jogador
+        )
+    ORDER BY j.nome ASC;
+
 
 -- | 
 -- +------------------------------------
@@ -58,10 +72,13 @@
 -- | usando inner-join 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Exibe as contratações com os nomes do jogador e gestor envolvidos.
 -- | 
 
--- Código SQL aqui
+    SELECT cg.id_contratacao, j.nome AS jogador, g.nome AS gestor, cg.contratado_em
+    FROM contratacao_gestor cg
+    INNER JOIN jogador j ON cg.id_jogador = j.id_jogador
+    INNER JOIN gestor g ON cg.id_gestor = g.id_gestor;
 
 -- | 
 -- +------------------------------------
@@ -72,10 +89,20 @@
 -- | três tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Exibe todos os rendimentos dos investimentos em Mercado de cada jogador
 -- | 
 
--- Código SQL aqui
+    SELECT 
+        j.nome AS nome_jogador, 
+        ti.nome AS nome_investimento, 
+        r.valor_obtido AS valor_rendimento, 
+        r.ciclo_concluido_em, 
+        r.coletado_em
+    FROM rendimentos r 
+    INNER JOIN investimentos i ON r.id_inv = i.id_inv
+    INNER JOIN tipo_investimento ti ON i.id_tipo_inv = ti.id_tipo_investimento
+    INNER JOIN jogador j ON i.id_jogador = j.id_jogador
+    WHERE ti.nome = 'Mercado';
 
 -- | 
 -- +------------------------------------
@@ -86,10 +113,13 @@
 -- | NULL, envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Exibe os investimentos que já foram coletados ao menos uma vez
 -- | 
 
--- Código SQL aqui
+    SELECT ti.nome AS "tipo investimento", ti.rendimento_ciclo
+    FROM investimentos inv
+    INNER JOIN tipo_investimento ti ON inv.id_tipo_inv = ti.id_tipo_investimento
+    WHERE inv.ultima_coleta_em IS NOT NULL;
 
 -- | 
 -- +------------------------------------
@@ -98,13 +128,17 @@
 -- [I]----------------------------------
 -- | Implementar uma consulta usando a cláusula like 
 -- | e o argumento %, envolvendo no mínimo 
--- | 2tabelas 
+-- | 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Exibe os investimentos adquiridos pelo jogador com id '4' 
+-- | no mês de jun/2024
 -- | 
 
--- Código SQL aqui
+    SELECT j.nome as jogador, inv.id_inv, inv.obtido_em
+    FROM investimentos inv 
+    INNER JOIN jogador j ON inv.id_jogador = j.id_jogador
+    WHERE inv.id_jogador = 4 AND inv.obtido_em::varchar LIKE '2024-06-%';
 
 -- | 
 -- +------------------------------------
@@ -113,13 +147,20 @@
 -- [J]----------------------------------
 -- | Implementar uma consulta usando a cláusula like 
 -- | e o argumento _, envolvendo no mínimo 
--- | 2tabelas 
+-- | 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Exibe os investimentos de todos os jogadores
+-- | onde o nome comece com J e tenha mais de 3
+-- | caracteres. 
 -- | 
 
--- Código SQL aqui
+    SELECT j.nome, j.email, ti.nome 
+    FROM investimentos i
+    JOIN jogador j on j.id_jogador = i.id_jogador
+    JOIN tipo_investimento ti on ti.id_tipo_investimento = i.id_tipo_inv
+    WHERE j.nome LIKE 'J__%';
+    -- WHERE i.rendimento_atual::varchar LIKE '1___.__';
 
 -- | 
 -- +------------------------------------
@@ -127,13 +168,20 @@
 
 -- [K]----------------------------------
 -- | Implementar uma consulta com subconsulta, usando a 
--- | cláusula IN, envolvendo no mínimo 2tabelas 
+-- | cláusula IN, envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Retorna todas as melhorias contratadas referentes
+-- | ao Carrinho de Picolé
 -- | 
 
--- Código SQL aqui
+    SELECT j.nome as jogador, tm.nome as melhoria, m.adquirido_em
+    FROM melhorias m
+    JOIN jogador j on m.id_jogador = j.id_jogador
+    JOIN tipo_melhoria tm on tm.id_tipo_melhoria = m.id_tipo_melhoria
+    WHERE m.id_tipo_melhoria IN (
+        SELECT id_tipo_melhoria FROM tipo_melhoria tm WHERE id_tipo_inv = 1
+    );
 
 -- | 
 -- +------------------------------------
@@ -141,14 +189,21 @@
 
 -- [L]----------------------------------
 -- | Implementar uma consulta com subconsulta, usando a 
--- | cláusula ANY ou ALL, envolvendo nomínimo 2 
+-- | cláusula ANY ou ALL, envolvendo no mínimo 2 
 -- | tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Seleciona o(s) investimento(s) de maior rendimento atual
 -- | 
 
--- Código SQL aqui
+    SELECT ti.nome, i.nivel_atual, i.rendimento_atual, j.nome as jogador
+    FROM investimentos i 
+    JOIN tipo_investimento ti on ti.id_tipo_investimento = i.id_tipo_inv
+    JOIN jogador j on j.id_jogador = i.id_jogador
+    WHERE i.rendimento_atual >= ALL (
+       SELECT rendimento_atual 
+       FROM investimentos 
+    );
 
 -- | 
 -- +------------------------------------
@@ -156,13 +211,21 @@
 
 -- [M]----------------------------------
 -- | Implementar uma consulta com subconsulta, usando a 
--- | cláusula EXISTS, envolvendo no mínimo 2tabelas 
+-- | cláusula EXISTS, envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Seleciona os investimentos de que possuem melhorias compradas 
 -- | 
 
--- Código SQL aqui
+    SELECT j.nome as jogador, ti.nome 
+    FROM tipo_investimento ti
+    JOIN investimentos i on i.id_tipo_inv = ti.id_tipo_investimento
+    JOIN jogador j on j.id_jogador = i.id_jogador
+    WHERE EXISTS (
+        SELECT m.* FROM melhorias m 
+        JOIN tipo_melhoria tm on tm.id_tipo_melhoria = m.id_tipo_melhoria
+        WHERE tm.id_tipo_inv = i.id_tipo_inv 
+    );
 
 -- | 
 -- +------------------------------------
@@ -173,10 +236,39 @@
 -- | envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- |  
 -- | 
 
--- Código SQL aqui
+    SELECT tipo, nome, COALESCE(quantidade, 0) FROM (
+        SELECT 'Investimento' as tipo, ti.nome, x.count as quantidade
+        FROM tipo_investimento ti 
+        LEFT JOIN (
+            SELECT id_tipo_inv, COUNT(id_tipo_inv)
+            FROM investimentos
+            GROUP BY id_tipo_inv
+        ) x on x.id_tipo_inv = ti.id_tipo_investimento 
+
+        UNION
+
+        SELECT 'Melhoria' as tipo, tm.nome, x.count as quantidade
+        FROM tipo_melhoria tm 
+        LEFT JOIN (
+            SELECT id_tipo_melhoria, COUNT(id_tipo_melhoria)
+            FROM melhorias
+            GROUP BY id_tipo_melhoria
+        ) x on x.id_tipo_melhoria = tm.id_tipo_melhoria
+
+        UNION
+
+        SELECT 'Item' as tipo, ti.nome, x.count as quantidade
+        FROM tipo_item ti 
+        LEFT JOIN (
+            SELECT id_tipo_item, COUNT(id_tipo_item)
+            FROM itens
+            GROUP BY id_tipo_item
+        ) x on x.id_tipo_item = ti.id_tipo_item
+    )
+    ORDER BY tipo;
 
 -- | 
 -- +------------------------------------
@@ -188,10 +280,15 @@
 -- | no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Retorna todo o valor ja coletado por tipo de investimento
 -- | 
 
--- Código SQL aqui
+    SELECT ti.nome as investimento, SUM(r.valor_obtido) as total
+    FROM rendimentos r 
+    JOIN investimentos i on i.id_inv = r.id_inv
+    JOIN tipo_investimento ti on ti.id_tipo_investimento = i.id_tipo_inv
+    WHERE r.coletado_em IS NOT NULL
+    GROUP BY ti.id_tipo_investimento;
 
 -- | 
 -- +------------------------------------
@@ -199,13 +296,20 @@
 
 -- [P]----------------------------------
 -- | Implementar uma consulta usando a cláusula GROUP 
--- | BY e HAVING, envolvendo no mínimo 2tabelas 
+-- | BY e HAVING, envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Retorna somente os tipos de investimento que ja geraram
+-- | mais de 50 reais. 
 -- | 
 
--- Código SQL aqui
+    SELECT ti.nome as investimento
+    FROM rendimentos r 
+    JOIN investimentos i on i.id_inv = r.id_inv
+    JOIN tipo_investimento ti on ti.id_tipo_investimento = i.id_tipo_inv
+    WHERE r.coletado_em IS NOT NULL
+    GROUP BY ti.id_tipo_investimento
+    HAVING SUM(r.valor_obtido) > 50;
 
 -- | 
 -- +------------------------------------
@@ -215,10 +319,11 @@
 -- | Implementar uma consulta usando a cláusula DELETE 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Exclui o jogador núm. 5 da tabela de jogadores
 -- | 
 
--- Código SQL aqui
+    DELETE FROM jogador
+    WHERE id_jogador = 5;
 
 -- | 
 -- +------------------------------------
@@ -229,10 +334,31 @@
 -- | atualizando mais de dois atributos 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Atualiza o nível de um investimento de id 1
 -- | 
 
--- Código SQL aqui
+    UPDATE investimentos i
+    SET 
+        nivel_atual = nivel_atual + 1,
+        
+        -- | Preço atual = 
+        -- |    Preço atual * ( 1 + $taxa_de_crescimento_de_preço / 100 ) 
+        -- |    Preço atual * ( 1 + 10 / 100 ) 
+        -- |    Preço atual * ( 1 + 0.10 )  
+        -- |    Preço atual * 1.1
+        -- | 
+
+        preco_atual = (
+            preco_atual * ( 1 + (SELECT gr_preco from tipo_investimento ti WHERE ti.id_tipo_investimento = i.id_tipo_inv) / 100 )
+        ),
+
+        -- | Mesmo processo para o rendimento
+
+        rendimento_atual = (
+            rendimento_atual * ( 1 + (SELECT gr_rendimento from tipo_investimento ti WHERE ti.id_tipo_investimento = i.id_tipo_inv) / 100 )
+        ),
+        ultimo_ciclo_iniciou_em = CURRENT_TIMESTAMP
+    WHERE id_inv = 1;
 
 -- | 
 -- +------------------------------------
@@ -242,10 +368,22 @@
 -- | Implementar uma consulta usando a cláusula DROP 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Faz com que o campo atributo melhorado não seja mais
+-- | mais necessário.
 -- | 
 
--- Código SQL aqui
+    -- |
+    -- | Primeiro remover coluna que é dependente ta tabela a ser removida.
+    -- |
+
+    ALTER TABLE tipo_melhoria
+    DROP COLUMN id_atributo_melhorado; 
+
+    -- |
+    -- | Remove a tabela.
+    -- |
+    
+    DROP atributos_melhoraveis;
 
 -- | 
 -- +------------------------------------
@@ -256,10 +394,52 @@
 -- | 3 tabelas 
 -- +------------------------------------
 -- | 
--- | // Insira comentário aqui.
+-- | Visão do administrador, reúne diversas informações 
+-- | sobre a atividade dos jogadores. 
 -- | 
 
--- Código SQL aqui
+    CREATE VIEW admin AS
+    SELECT 
+        j.nome, j.email, j.saldo,
+        COALESCE(i.count, 0) as investimentos,
+        COALESCE(c.count, 0) as gestores,
+        COALESCE(m.count, 0) as melhorias,
+        COALESCE(it.count, 0) as itens,
+        COALESCE(r.count, 0) as total_coletado
+
+    FROM jogador j
+
+    LEFT JOIN (
+        SELECT i.id_jogador, COUNT(i.id_jogador) as count
+        FROM investimentos i 
+        GROUP BY i.id_jogador   
+    ) i on i.id_jogador = j.id_jogador
+
+    LEFT JOIN ( 
+        SELECT c.id_jogador, COUNT(c.id_jogador) as count
+        FROM contratacao_gestor c
+        GROUP BY c.id_jogador
+    ) c on c.id_jogador = j.id_jogador
+
+    LEFT JOIN ( 
+        SELECT c.id_jogador, COUNT(c.id_jogador) as count
+        FROM melhorias c
+        GROUP BY c.id_jogador
+    ) m on m.id_jogador = j.id_jogador
+
+    LEFT JOIN ( 
+        SELECT c.id_jogador, COUNT(c.id_jogador) as count
+        FROM itens c
+        GROUP BY c.id_jogador
+    ) it on it.id_jogador = j.id_jogador
+
+    LEFT JOIN (
+        SELECT i.id_jogador, SUM( r.valor_obtido ) as count
+        FROM rendimentos r
+        JOIN investimentos i on i.id_inv = r.id_inv
+        WHERE r.coletado_em IS NOT NULL
+        GROUP BY i.id_jogador
+    ) r on r.id_jogador = j.id_jogador
 
 -- | 
 -- +------------------------------------

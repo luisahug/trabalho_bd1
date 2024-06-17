@@ -77,7 +77,7 @@ CREATE TABLE investimentos(
     -- Atributos adicionais
     preco_atual       DECIMAL(20, 2),
     rendimento_atual  DECIMAL(20, 2),
-    t_ciclo_atual_sec DECIMAL(2,2), -- Deve haver uma conversão
+    t_ciclo_atual_sec DECIMAL(20,2), -- Deve haver uma conversão
         
 	obtido_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -103,7 +103,7 @@ BEGIN
 	SELECT * INTO ti from tipo_investimento WHERE id_tipo_investimento = NEW.id_tipo_inv;
  
     IF NEW.preco_atual IS NULL THEN
-        NEW.preco_atual := ti.custo_aquisicao * ti.gr_preco;
+        NEW.preco_atual := ti.valor_aquisicao * ti.gr_preco;
     END IF;
 
     IF NEW.rendimento_atual IS NULL THEN
@@ -111,7 +111,7 @@ BEGIN
     END IF;
 
 	IF NEW.t_ciclo_atual_sec IS NULL THEN
-        NEW.t_ciclo_atual_sec := ti.tempo_ciclo_sec;
+        NEW.t_ciclo_atual_sec := ti.tempo_ciclo_sec::float;
     END IF;
 
     RETURN NEW;
@@ -180,10 +180,12 @@ CREATE TABLE itens(
 
 	esta_em_destaque CHAR(1) CHECK (esta_em_destaque IN ('s', 'n')) DEFAULT 'n',
 
-	obtido_em TIMESTAMP,
+	obtido_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
 	CONSTRAINT fk_tipo_item 
 		FOREIGN KEY (id_tipo_item) REFERENCES tipo_item (id_tipo_item) ON DELETE CASCADE,
 	CONSTRAINT fk_id_jogador
 		FOREIGN KEY (id_jogador) REFERENCES jogador (id_jogador) ON DELETE CASCADE
 );
+
+
