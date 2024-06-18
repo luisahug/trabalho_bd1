@@ -19,7 +19,7 @@
 -- | respectivos gestores
 -- | 
 
-    SELECT ti.nome, g.nome as gestor
+    SELECT ti.nome AS investimento, g.nome AS gestor
     FROM tipo_investimento ti, gestor g
     WHERE ti.id_tipo_investimento = g.id_tipo_inv;
 
@@ -35,7 +35,15 @@
 -- | Exibe os itens dos usuários e as informações de cada tipo de item
 -- | 
 
-    SELECT itens.*, tipo_item.*
+    SELECT 
+        itens.cod_item,
+        itens.id_jogador,
+        tipo_item.nome AS item,
+        itens.posicao_inventario,
+        itens.esta_em_destaque,
+        itens.obtido_em,
+        tipo_item.preco_aquisicao,
+        tipo_item.quant_vendas
     FROM itens
     INNER JOIN tipo_item
     USING(id_tipo_item);
@@ -53,7 +61,10 @@
 -- | sobre o tipo e o jogador dono.
 -- | 
 
-    SELECT ti.nome, i.obtido_em, j.nome as jogador
+    SELECT 
+        ti.nome AS investimento,
+        i.obtido_em,
+        j.nome AS jogador
     FROM tipo_investimento ti, jogador j, investimentos i
     WHERE 
         (
@@ -116,7 +127,7 @@
 -- | Exibe os investimentos que já foram coletados ao menos uma vez
 -- | 
 
-    SELECT ti.nome AS "tipo investimento", ti.rendimento_ciclo
+    SELECT inv.id_inv, ti.nome AS "tipo investimento", ti.rendimento_ciclo
     FROM investimentos inv
     INNER JOIN tipo_investimento ti ON inv.id_tipo_inv = ti.id_tipo_investimento
     WHERE inv.ultima_coleta_em IS NOT NULL;
@@ -155,12 +166,11 @@
 -- | caracteres. 
 -- | 
 
-    SELECT j.nome, j.email, ti.nome 
+    SELECT j.id_jogador, j.nome, ti.nome AS "investimento"
     FROM investimentos i
     JOIN jogador j on j.id_jogador = i.id_jogador
     JOIN tipo_investimento ti on ti.id_tipo_investimento = i.id_tipo_inv
     WHERE j.nome LIKE 'J__%';
-    -- WHERE i.rendimento_atual::varchar LIKE '1___.__';
 
 -- | 
 -- +------------------------------------
@@ -217,7 +227,7 @@
 -- | Seleciona os investimentos de que possuem melhorias compradas 
 -- | 
 
-    SELECT j.nome as jogador, ti.nome 
+    SELECT j.nome as jogador, i.id_inv, ti.nome 
     FROM tipo_investimento ti
     JOIN investimentos i on i.id_tipo_inv = ti.id_tipo_investimento
     JOIN jogador j on j.id_jogador = i.id_jogador
@@ -235,11 +245,13 @@
 -- | Implementar uma consulta usando a cláusula UNION, 
 -- | envolvendo no mínimo 2 tabelas 
 -- +------------------------------------
--- | 
+-- | Retorna a quantidade total de cada entidade coletável do jogo 
+-- | (investimentos, melhorias, itens)
 -- |  
 -- | 
 
-    SELECT tipo, nome, COALESCE(quantidade, 0) FROM (
+    SELECT tipo, nome, COALESCE(quantidade, 0) as quantidade 
+    FROM (
         SELECT 'Investimento' as tipo, ti.nome, x.count as quantidade
         FROM tipo_investimento ti 
         LEFT JOIN (
@@ -280,7 +292,7 @@
 -- | no mínimo 2 tabelas 
 -- +------------------------------------
 -- | 
--- | Retorna todo o valor ja coletado por tipo de investimento
+-- | Retorna todo o valor já coletado por tipo de investimento
 -- | 
 
     SELECT ti.nome as investimento, SUM(r.valor_obtido) as total
@@ -439,7 +451,7 @@
         JOIN investimentos i on i.id_inv = r.id_inv
         WHERE r.coletado_em IS NOT NULL
         GROUP BY i.id_jogador
-    ) r on r.id_jogador = j.id_jogador
+    ) r on r.id_jogador = j.id_jogador;
 
 -- | 
 -- +------------------------------------
